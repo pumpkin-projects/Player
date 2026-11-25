@@ -1,4 +1,4 @@
-const C="moonlit-v9";
+const C="moonlit-v10";
 const ASSETS=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./apple-touch-icon.png"];
 const CDN="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js";
 self.addEventListener("install",e=>{e.waitUntil((async()=>{const c=await caches.open(C);await c.addAll(ASSETS);try{await c.put(CDN,await fetch(CDN,{mode:"no-cors"}))}catch(_){}})());self.skipWaiting()});
