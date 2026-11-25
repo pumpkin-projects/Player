@@ -94,7 +94,7 @@ body.pl .eq b{animation:eq .9s ease-in-out infinite}
 .top .r button{border-radius:10px;font-weight:700;min-width:38px;height:38px;display:flex;align-items:center;justify-content:center}
 .top .r svg{width:22px;height:22px}
 #sheet:not(.artmode) #lyrbtn{background:rgba(255,255,255,.24);opacity:1}
-body.so header,body.so #list,body.so #prog,body.so #seg{display:none}
+body.so header,body.so #list,body.so #prog,body.so #seg,body.so #sbar{display:none}
 #seg{display:flex;gap:4px;margin:6px 20px 4px;padding:3px;background:var(--card);border-radius:11px}
 #seg button{flex:1;padding:7px 0;border-radius:9px;font-size:14px;font-weight:600;color:var(--mut)}
 #seg button.on{background:var(--bg);color:var(--fg);box-shadow:0 1px 4px rgba(0,0,0,.35)}
@@ -102,15 +102,47 @@ body.so header,body.so #list,body.so #prog,body.so #seg{display:none}
 .sec span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sec i{font-style:normal;font-size:13px;font-weight:600;color:var(--mut);padding-left:10px}
 .th{border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#sheet{height:auto}
+#lyr.empty{overflow:hidden;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-mask-image:none;mask-image:none}
+#lyr.empty .nol{margin:0;text-align:center}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 6px;position:relative}
+.brand{display:flex;align-items:center;gap:8px;font-size:27px;font-weight:800;letter-spacing:-.5px}
+.brand span{background:linear-gradient(90deg,var(--fg),#b9a6ff,var(--fg));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+@keyframes shine{to{background-position:-200% 0}}
+.moonlogo{width:30px;height:30px;animation:float 4.5s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,214,140,.55))}
+@keyframes float{50%{transform:translateY(-3px) rotate(-8deg)}}
+.tw{animation:tw 2.4s ease-in-out infinite}.tw.d{animation-delay:-1.2s}
+@keyframes tw{50%{opacity:.2}}
+.plus{width:40px;height:40px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center}
+.plus svg{width:22px;height:22px;transition:transform .25s}
+.plus.on svg{transform:rotate(45deg)}
+#menu{position:absolute;right:20px;top:66px;z-index:6;background:var(--card);border-radius:14px;padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.5);transform:scale(.9);transform-origin:top right;opacity:0;pointer-events:none;transition:.18s}
+#menu.open{transform:none;opacity:1;pointer-events:auto}
+#menu button{display:block;width:100%;text-align:left;padding:12px 18px;font-weight:600;border-radius:9px;white-space:nowrap}
+#menu button:active{background:rgba(255,255,255,.1)}
+#sbar{display:flex;align-items:center;gap:10px;margin:8px 20px;padding:0 14px;height:42px;border-radius:12px;background:var(--card);color:var(--mut)}
+#sbar svg{width:18px;height:18px;flex:none}
+#sbar input{flex:1;background:none;border:0;outline:0;color:var(--fg);font:inherit;font-size:16px;min-width:0;-webkit-appearance:none}
+#seg{display:flex;gap:8px;margin:4px 20px 10px;padding:0;background:none;border-radius:0;overflow-x:auto;scrollbar-width:none}
+#seg button{flex:none;padding:8px 16px;border-radius:20px;background:var(--card);font-size:14px;font-weight:600;color:var(--fg)}
+#seg button.on{background:var(--fg);color:var(--bg);box-shadow:none}
+.chev{color:var(--mut);font-size:26px;padding:0 4px}
+.gh{display:flex;align-items:center;gap:12px;padding:6px 20px 10px}
+.gh button{width:36px;height:36px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center}
+.gh svg{width:20px;height:20px;transform:rotate(90deg)}
+.gh b{display:block;font-size:22px;letter-spacing:-.3px}.gh span{color:var(--mut);font-size:13px}
+.row{padding:8px 20px}
+.th{width:54px;height:54px}
 </style>
 </head>
 <body>
-<header><h1>Library</h1><div style="display:flex;gap:8px"><button class="add" id="addf" style="background:var(--card);color:var(--fg)">Folder</button><button class="add" id="addb">Add songs</button></div></header>
+<header><div class="brand"><svg class="moonlogo" viewBox="0 0 24 24"><defs><linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe9"/><stop offset="1" stop-color="#ffc979"/></linearGradient></defs><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="url(#mg)"/><circle class="tw" cx="19.5" cy="5" r="1.1" fill="#fff"/><circle class="tw d" cx="22" cy="9" r=".7" fill="#fff"/></svg><span>Moonlit</span></div><button class="plus" id="plusb" aria-label="Add music"><svg viewBox="0 0 24 24"><path d="M12 4.5a1.2 1.2 0 0 1 1.2 1.2v5.1h5.1a1.2 1.2 0 0 1 0 2.4h-5.1v5.1a1.2 1.2 0 0 1-2.4 0v-5.1H5.7a1.2 1.2 0 0 1 0-2.4h5.1V5.7A1.2 1.2 0 0 1 12 4.5z"/></svg></button><div id="menu"><button id="addb">Add songs</button><button id="addf">Add folder</button></div></header>
 <div id="prog" style="padding:0 20px;color:var(--mut);font-size:14px"></div>
 <input type="file" id="file" multiple hidden>
 <input type="file" id="lf" hidden>
 <input type="file" id="dir" webkitdirectory multiple hidden>
-<div id="seg"><button class="on" data-v="songs">Songs</button><button data-v="albums">Albums</button><button data-v="artists">Artists</button><button data-v="folders">Folders</button></div>
+<div id="sbar"><svg viewBox="0 0 24 24"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.3 4.3a1.1 1.1 0 0 1-1.6 1.6l-4.3-4.3A7.5 7.5 0 1 1 10.5 3zm0 2.2a5.3 5.3 0 1 0 0 10.6 5.3 5.3 0 0 0 0-10.6z"/></svg><input id="q" type="search" placeholder="Search songs, artists" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+<div id="seg"><button class="on" data-v="songs">All</button><button data-v="albums">Albums</button><button data-v="artists">Artists</button><button data-v="folders">Folders</button></div>
 <div id="list"></div>
 
 <div id="mini">
@@ -207,18 +239,23 @@ $("#addf").onclick=()=>$("#dir").click();
 /* library */
 function render(){
   sortSongs();const L=$("#list");
-  if(!songs.length){L.innerHTML='<div class="empty"><b>No songs yet</b>Tap Add songs or Folder, then pick your music. Select the matching .lrc files in the same step to get synced lyrics.</div>';return}
+  if(!songs.length){L.innerHTML='<div class="empty"><b>No songs yet</b>Tap the + button to add songs or a whole folder. Pick the matching .lrc files too for synced lyrics.</div>';return}
   const row=(s,i)=>`<div class="row${i===cur?" on":""}" data-i="${i}"><div class="th" style="background-image:url('${artOf(s)}')"></div><div><div class="t">${i===cur?'<i class="eq"><b></b><b></b><b></b></i>':""}${esc(s.title)}</div><div class="a">${esc(s.artist)}</div></div><button class="del" data-d="${i}" aria-label="Remove">×</button></div>`;
-  const keyf={songs:s=>{const c=s.title.trim().charAt(0).toUpperCase();return/[A-Z]/.test(c)?c:"#"},albums:s=>s.album||"Unknown album",artists:s=>s.artist||"Unknown artist",folders:s=>s.folder||"Imported"}[view];
-  const g=new Map();
-  songs.forEach((s,i)=>{const k=keyf(s);if(!g.has(k))g.set(k,[]);g.get(k).push(i)});
-  const ks=[...g.keys()].sort((a,b)=>a==="#"?1:b==="#"?-1:a.localeCompare(b,undefined,{sensitivity:"base"}));
-  L.innerHTML=ks.map(k=>'<div class="sec"><span>'+esc(k)+'</span><i>'+g.get(k).length+'</i></div>'+g.get(k).map(i=>row(songs[i],i)).join("")).join("");
+  const KF={albums:s=>s.album||"Unknown album",artists:s=>s.artist||"Unknown artist",folders:s=>s.folder||"Imported"};
+  const idx=songs.map((s,i)=>i),q=$("#q").value.trim().toLowerCase();let html="";
+  if(q){const r=idx.filter(i=>(songs[i].title+" "+songs[i].artist+" "+(songs[i].album||"")).toLowerCase().includes(q));html=r.length?r.map(i=>row(songs[i],i)).join(""):'<div class="empty">No results</div>'}
+  else if(view==="songs"){html=idx.map(i=>row(songs[i],i)).join("")}
+  else if(group!==null){const r=idx.filter(i=>KF[view](songs[i])===group);html='<div class="gh"><button id="back" aria-label="Back">'+I.down+'</button><div><b>'+esc(group)+'</b><span>'+r.length+' songs</span></div></div>'+r.map(i=>row(songs[i],i)).join("")}
+  else{const g=new Map();idx.forEach(i=>{const k=KF[view](songs[i]);if(!g.has(k))g.set(k,[]);g.get(k).push(i)});
+    html=[...g.keys()].sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:"base"})).map(k=>{const m=g.get(k);return `<div class="row" data-g="${esc(k)}"><div class="th" style="background-image:url('${artOf(songs[m[0]])}')"></div><div><div class="t">${esc(k)}</div><div class="a">${m.length} song${m.length>1?"s":""}</div></div><span class="chev">›</span></div>`}).join("")}
+  L.innerHTML=html;
 }
 $("#list").onclick=async e=>{
+  if(e.target.closest("#back")){group=null;render();return}
+  const gr=e.target.closest("[data-g]");if(gr){group=gr.dataset.g;render();scrollTo(0,0);return}
   const d=e.target.closest("[data-d]");
   if(d){const i=+d.dataset.d,s=songs[i];if(i===cur){au.pause();au.removeAttribute("src");cur=-1;$("#mini").style.display="none";setSheet(false)}else if(i<cur)cur--;await del(s.id);songs.splice(i,1);render();return}
-  const r=e.target.closest(".row");if(r){play(+r.dataset.i);}
+  const r=e.target.closest("[data-i]");if(r){play(+r.dataset.i);}
 };
 
 /* playback */
@@ -235,7 +272,7 @@ function play(i){
   if("mediaSession"in navigator){try{navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist,artwork:art?[{src:art,sizes:"512x512",type:s.artBlob.type}]:[]})}catch(e){}}
 }
 function loadLyrics(s){
-  lines=parseLRC(s.lrc);ai=-2;const box=$("#lyr");box.scrollTop=0;
+  lines=parseLRC(s.lrc);ai=-2;const box=$("#lyr");box.scrollTop=0;box.classList.toggle("empty",!lines.length);
   if(!lines.length){box.innerHTML='<div class="nol">No lyrics for this song<br><button class="add" id="al" style="margin-top:16px">Add .lrc file</button></div>';return}
   const plain=lines[0].t===null;
   box.innerHTML=lines.map((l,i)=>`<div class="l${plain?" plain":""}" data-i="${i}">${esc(l.s)}</div>`).join("");
@@ -290,12 +327,16 @@ if("mediaSession"in navigator){
 $("#lf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f&&songs[cur])setLrc(songs[cur],await f.text())};
 const tgArt=()=>$("#sheet").classList.toggle("artmode");
 $("#lyrbtn").onclick=tgArt;
-let view="songs",sy=0;
+$("#plusb").onclick=e=>{e.stopPropagation();$("#menu").classList.toggle("open");$("#plusb").classList.toggle("on")};
+$("#menu").onclick=()=>{$("#menu").classList.remove("open");$("#plusb").classList.remove("on")};
+document.addEventListener("click",e=>{if(!e.target.closest("#menu,#plusb")){$("#menu").classList.remove("open");$("#plusb").classList.remove("on")}});
+$("#q").oninput=()=>{render()};
+let view="songs",group=null,sy=0;
 const rec=s=>({id:s.id,key:s.key,title:s.title,artist:s.artist,album:s.album,folder:s.folder,blob:s.blob,artBlob:s.artBlob,lrc:s.lrc});
 function folderOf(f){const p=(f.webkitRelativePath||"").split("/");return p.length>1?p[p.length-2]:"Imported"}
 function sortSongs(){const c=songs[cur];songs.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:"base"}));cur=c?songs.indexOf(c):-1}
 function setSheet(o){const s=$("#sheet");if(o){sy=scrollY;s.classList.add("open");document.body.classList.add("so")}else{s.classList.remove("open");document.body.classList.remove("so");scrollTo(0,sy)}}
-$("#seg").onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;view=b.dataset.v;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));render();scrollTo(0,0)};
+$("#seg").onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;view=b.dataset.v;group=null;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));render();scrollTo(0,0)};
 $("#sth").onclick=tgArt;$("#bigart").onclick=tgArt;
 let y0=null,dy=0;const sh=$("#sheet");
 sh.addEventListener("touchstart",e=>{y0=e.target.closest("#lyr,#seek")?null:e.touches[0].clientY;dy=0},{passive:true});
