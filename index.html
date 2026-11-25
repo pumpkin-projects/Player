@@ -85,6 +85,23 @@ body.pl .eq b{animation:eq .9s ease-in-out infinite}
 .eq b:nth-child(2){animation-delay:-.3s!important}.eq b:nth-child(3){animation-delay:-.6s!important}
 @keyframes eq{0%,100%{height:3px}50%{height:12px}}
 #sheet.drag{transition:none}
+#sheet{height:100vh;height:100dvh}
+#lyr{flex:1 1 0;min-height:0;overscroll-behavior:contain;padding:12vh 22px 30vh}
+.info,.bar,.ctl,.top{flex:none}
+#art{min-height:0}#bigart{max-width:min(100%,48vh)}
+#sheet.artmode #lyrtoggle,#sheet.artmode .info .th{display:none}
+.top .r{display:flex;gap:6px;align-items:center}
+.top .r button{border-radius:10px;font-weight:700;min-width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+.top .r svg{width:22px;height:22px}
+#sheet:not(.artmode) #lyrbtn{background:rgba(255,255,255,.24);opacity:1}
+body.so header,body.so #list,body.so #prog,body.so #seg{display:none}
+#seg{display:flex;gap:4px;margin:6px 20px 4px;padding:3px;background:var(--card);border-radius:11px}
+#seg button{flex:1;padding:7px 0;border-radius:9px;font-size:14px;font-weight:600;color:var(--mut)}
+#seg button.on{background:var(--bg);color:var(--fg);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;padding:18px 20px 6px;font-size:20px;font-weight:800;letter-spacing:-.3px;border-bottom:1px solid var(--card);margin-bottom:4px}
+.sec span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec i{font-style:normal;font-size:13px;font-weight:600;color:var(--mut);padding-left:10px}
+.th{border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
@@ -93,6 +110,7 @@ body.pl .eq b{animation:eq .9s ease-in-out infinite}
 <input type="file" id="file" multiple hidden>
 <input type="file" id="lf" hidden>
 <input type="file" id="dir" webkitdirectory multiple hidden>
+<div id="seg"><button class="on" data-v="songs">Songs</button><button data-v="albums">Albums</button><button data-v="artists">Artists</button><button data-v="folders">Folders</button></div>
 <div id="list"></div>
 
 <div id="mini">
@@ -102,9 +120,9 @@ body.pl .eq b{animation:eq .9s ease-in-out infinite}
   <button id="mn" aria-label="Next"></button>
 </div>
 
-<div id="sheet">
+<div id="sheet" class="artmode">
   <div id="bg"></div>
-  <div class="top"><button id="close" aria-label="Close"></button><button id="lyrtoggle" aria-label="Lyrics size">Aa</button></div>
+  <div class="top"><button id="close" aria-label="Close"></button><div class="r"><button id="lyrtoggle" aria-label="Lyrics size">Aa</button><button id="lyrbtn" aria-label="Lyrics"><svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-6.2l-5.3 3.5a.7.7 0 0 1-1.2-.5V18H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm4 5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2zm0 4a1 1 0 0 0 0 2h5a1 1 0 0 0 0-2z"/></svg></button></div></div>
   <div id="lyr"></div>
   <div id="art"><div id="bigart"></div></div>
   <div class="info"><div class="th" id="sth"></div><div class="m"><div class="t" id="st"></div><div class="a" id="sa"></div></div></div>
@@ -141,7 +159,7 @@ const del=id=>tx("readwrite",o=>o.delete(id));
 /* helpers */
 const base=n=>n.replace(/\.[^.]+$/,"").toLowerCase().trim();
 const nk=n=>String(n).toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
-function setLrc(s,t){s.lrc=t;put({id:s.id,key:s.key,title:s.title,artist:s.artist,blob:s.blob,artBlob:s.artBlob,lrc:s.lrc});if(songs[cur]===s)loadLyrics(s)}
+function setLrc(s,t){s.lrc=t;put(rec(s));if(songs[cur]===s)loadLyrics(s)}
 const fmt=t=>{if(!isFinite(t))return"0:00";t=Math.floor(t);return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function readTags(f){return new Promise(r=>{try{window.jsmediatags.read(f,{onSuccess:t=>r(t.tags),onError:()=>r({})})}catch(e){r({})}})}
@@ -170,13 +188,13 @@ async function addFiles(all){
     $("#prog").textContent="Adding "+(++done)+" of "+nAud+"…";
     await new Promise(r=>setTimeout(r,0));
     const ex=songs.find(x=>nk(x.key)===nk(base(f.name)));
-    if(ex){const L0=pickL(nk(base(f.name)));if(L0)setLrc(ex,L0);continue}
+    if(ex){const L0=pickL(nk(base(f.name)));if(L0)setLrc(ex,L0);if(!ex.album){const t2=await readTags(f);ex.album=t2.album||"Unknown album";ex.folder=folderOf(f);put(rec(ex))}continue}
     const tg=await readTags(f);
     let emb=tg.lyrics&&(tg.lyrics.lyrics||(typeof tg.lyrics==="string"?tg.lyrics:""))||"";
     let artBlob=null;
     if(tg.picture){artBlob=new Blob([new Uint8Array(tg.picture.data)],{type:tg.picture.format||"image/jpeg"})}
-    const s={id:Date.now()+"-"+Math.random().toString(36).slice(2,7),key:base(f.name),title:tg.title||f.name.replace(/\.[^.]+$/,""),artist:tg.artist||"Unknown artist",blob:f,artBlob,lrc:pickL(nk(base(f.name)))||emb||""};
-    songs.push(s);put({id:s.id,key:s.key,title:s.title,artist:s.artist,blob:s.blob,artBlob:s.artBlob,lrc:s.lrc});
+    const s={id:Date.now()+"-"+Math.random().toString(36).slice(2,7),key:base(f.name),title:tg.title||f.name.replace(/\.[^.]+$/,""),artist:tg.artist||"Unknown artist",album:tg.album||"Unknown album",folder:folderOf(f),blob:f,artBlob,lrc:pickL(nk(base(f.name)))||emb||""};
+    songs.push(s);put(rec(s));
   }
   /* lrc files added later for songs already in the library */
   if(!nAud){for(const k in lrcs){let s=songs.find(x=>nk(x.key)===k)||songs.find(x=>{const a=nk(x.key);return a&&(a.includes(k)||k.includes(a))});if(!s&&Object.keys(lrcs).length===1&&cur>=0)s=songs[cur];if(s)setLrc(s,lrcs[k])}}
@@ -188,13 +206,18 @@ $("#addf").onclick=()=>$("#dir").click();
 
 /* library */
 function render(){
-  const L=$("#list");
-  if(!songs.length){L.innerHTML='<div class="empty"><b>No songs yet</b>Tap Add songs, then pick your audio files. Select the matching .lrc files in the same step to get synced lyrics.</div>';return}
-  L.innerHTML=songs.map((s,i)=>`<div class="row${i===cur?" on":""}" data-i="${i}"><div class="th" style="background-image:url('${artOf(s)}')"></div><div><div class="t">${i===cur?'<i class="eq"><b></b><b></b><b></b></i>':""}${esc(s.title)}</div><div class="a">${esc(s.artist)}</div></div><button class="del" data-d="${i}" aria-label="Remove">×</button></div>`).join("");
+  sortSongs();const L=$("#list");
+  if(!songs.length){L.innerHTML='<div class="empty"><b>No songs yet</b>Tap Add songs or Folder, then pick your music. Select the matching .lrc files in the same step to get synced lyrics.</div>';return}
+  const row=(s,i)=>`<div class="row${i===cur?" on":""}" data-i="${i}"><div class="th" style="background-image:url('${artOf(s)}')"></div><div><div class="t">${i===cur?'<i class="eq"><b></b><b></b><b></b></i>':""}${esc(s.title)}</div><div class="a">${esc(s.artist)}</div></div><button class="del" data-d="${i}" aria-label="Remove">×</button></div>`;
+  const keyf={songs:s=>{const c=s.title.trim().charAt(0).toUpperCase();return/[A-Z]/.test(c)?c:"#"},albums:s=>s.album||"Unknown album",artists:s=>s.artist||"Unknown artist",folders:s=>s.folder||"Imported"}[view];
+  const g=new Map();
+  songs.forEach((s,i)=>{const k=keyf(s);if(!g.has(k))g.set(k,[]);g.get(k).push(i)});
+  const ks=[...g.keys()].sort((a,b)=>a==="#"?1:b==="#"?-1:a.localeCompare(b,undefined,{sensitivity:"base"}));
+  L.innerHTML=ks.map(k=>'<div class="sec"><span>'+esc(k)+'</span><i>'+g.get(k).length+'</i></div>'+g.get(k).map(i=>row(songs[i],i)).join("")).join("");
 }
 $("#list").onclick=async e=>{
   const d=e.target.closest("[data-d]");
-  if(d){const i=+d.dataset.d,s=songs[i];if(i===cur){au.pause();au.removeAttribute("src");cur=-1;$("#mini").style.display="none";$("#sheet").classList.remove("open")}else if(i<cur)cur--;await del(s.id);songs.splice(i,1);render();return}
+  if(d){const i=+d.dataset.d,s=songs[i];if(i===cur){au.pause();au.removeAttribute("src");cur=-1;$("#mini").style.display="none";setSheet(false)}else if(i<cur)cur--;await del(s.id);songs.splice(i,1);render();return}
   const r=e.target.closest(".row");if(r){play(+r.dataset.i);}
 };
 
@@ -252,8 +275,8 @@ sk.onchange=()=>{if(au.duration)au.currentTime=sk.value/1000*au.duration;seeking
 /* controls */
 $("#mp").onclick=e=>{e.stopPropagation();toggle()};
 $("#mn").onclick=e=>{e.stopPropagation();next()};
-$("#mini").onclick=()=>$("#sheet").classList.add("open");
-$("#close").onclick=()=>$("#sheet").classList.remove("open");
+$("#mini").onclick=()=>setSheet(true);
+$("#close").onclick=()=>setSheet(false);
 $("#pp").onclick=toggle;$("#nx").onclick=()=>next();$("#pv").onclick=prev;
 $("#sh").onclick=()=>{shuf=!shuf;$("#sh").classList.toggle("act",shuf)};
 $("#rp").onclick=()=>{rep=(rep+1)%3;$("#rp").classList.toggle("act",rep>0);$("#rp").style.opacity=rep===2?"1":"";$("#rp").innerHTML=I.rep+(rep===2?'<span style="position:absolute;font-size:10px;font-weight:800;margin:-24px 0 0 14px">1</span>':"")};
@@ -266,11 +289,18 @@ if("mediaSession"in navigator){
 
 $("#lf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(f&&songs[cur])setLrc(songs[cur],await f.text())};
 const tgArt=()=>$("#sheet").classList.toggle("artmode");
+$("#lyrbtn").onclick=tgArt;
+let view="songs",sy=0;
+const rec=s=>({id:s.id,key:s.key,title:s.title,artist:s.artist,album:s.album,folder:s.folder,blob:s.blob,artBlob:s.artBlob,lrc:s.lrc});
+function folderOf(f){const p=(f.webkitRelativePath||"").split("/");return p.length>1?p[p.length-2]:"Imported"}
+function sortSongs(){const c=songs[cur];songs.sort((a,b)=>a.title.localeCompare(b.title,undefined,{numeric:true,sensitivity:"base"}));cur=c?songs.indexOf(c):-1}
+function setSheet(o){const s=$("#sheet");if(o){sy=scrollY;s.classList.add("open");document.body.classList.add("so")}else{s.classList.remove("open");document.body.classList.remove("so");scrollTo(0,sy)}}
+$("#seg").onclick=e=>{const b=e.target.closest("[data-v]");if(!b)return;view=b.dataset.v;document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x===b));render();scrollTo(0,0)};
 $("#sth").onclick=tgArt;$("#bigart").onclick=tgArt;
 let y0=null,dy=0;const sh=$("#sheet");
 sh.addEventListener("touchstart",e=>{y0=e.target.closest("#lyr,#seek")?null:e.touches[0].clientY;dy=0},{passive:true});
 sh.addEventListener("touchmove",e=>{if(y0===null)return;dy=e.touches[0].clientY-y0;if(dy>0){sh.classList.add("drag");sh.style.transform="translateY("+dy+"px)"}},{passive:true});
-sh.addEventListener("touchend",()=>{if(y0===null)return;sh.classList.remove("drag");sh.style.transform="";if(dy>110)sh.classList.remove("open");y0=null});
+sh.addEventListener("touchend",()=>{if(y0===null)return;sh.classList.remove("drag");sh.style.transform="";if(dy>110)setSheet(false);y0=null});
 /* init */
 $("#mp").innerHTML=I.play;$("#pp").innerHTML=I.play;$("#mn").innerHTML=I.next;$("#nx").innerHTML=I.next;
 $("#pv").innerHTML=I.prev;$("#close").innerHTML=I.down;$("#sh").innerHTML=I.shuf;$("#rp").innerHTML=I.rep;
